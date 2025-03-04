@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Dashboard</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #e0f7fa; /* Light blue background */
+        }
+
+        #weather-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 350px;
+        }
+
+        #location-input {
+            padding: 12px;
+            margin-bottom: 20px;
+            width: calc(100% - 24px); /* Adjust width to account for padding */
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        #get-weather-btn {
+            background-color: #4fc3f7; /* Light blue button */
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        #get-weather-btn:hover {
+            background-color: #29b6f6;
+        }
+
+        #weather-info {
+            margin-top: 30px;
+            text-align: left;
+        }
+
+        #weather-info p {
+            margin: 8px 0;
+            font-size: 18px;
+        }
+
+        #weather-info p strong {
+            font-weight: bold;
+        }
+
+        #error-message {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="weather-container">
+        <input type="text" id="location-input" placeholder="Enter location (city, country)">
+        <button id="get-weather-btn" onclick="getWeather()">Get Weather</button>
+        <div id="error-message"></div>
+
+        <div id="weather-info">
+            <p id="location"></p>
+            <p id="temperature"></p>
+            <p id="description"></p>
+        </div>
+    </div>
+
+    <script>
+        const apiKey = '192b04dd9bf2cf04f754ba2028a174c3'; // Replace with your API key
+
+        function getWeather() {
+            const location = document.getElementById('location-input').value;
+            const errorMessage = document.getElementById('error-message');
+            errorMessage.textContent = ''; // Clear previous error messages
+
+            if (!location) {
+                errorMessage.textContent = 'Please enter a location.';
+                return;
+            }
+
+            const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${location}&appid=${apiKey}&units=metric`;
+
+            fetch(apiUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    displayWeather(data);
+                })
+                .catch(error => {
+                    console.error('There has been a problem with your fetch operation:', error);
+                    errorMessage.textContent = 'Could not retrieve weather data. Please check your location and API key.';
+                });
+        }
+
+        function displayWeather(data) {
+            document.getElementById('location').textContent = `Location: ${data.name}, ${data.sys.country}`;
+            document.getElementById('temperature').textContent = `Temperature: ${data.main.temp} °C`;
+            document.getElementById('description').textContent = `Description: ${data.weather[0].description}`;
+        }
+    </script>
+
+</body>
+</html>
